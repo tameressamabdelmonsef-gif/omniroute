@@ -14021,6 +14021,7 @@
     "stateCancelled": "Cancelled",
     "overflowMore": "+{count} more",
     "emptyTitle": "Nothing running yet",
+    "noMatches": "No runs match these filters",
     "emptyCloudAgentCta": "Set up Cloud Agents",
     "emptyA2ACta": "Open A2A",
     "emptyConductorCta": "Open Conductor",
