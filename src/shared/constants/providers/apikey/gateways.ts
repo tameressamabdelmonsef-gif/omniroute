@@ -266,6 +266,27 @@ export const APIKEY_PROVIDERS_GATEWAYS = {
     apiHint:
       "Create a LiteRouter API key, then use https://api.literouter.com/v1 as the OpenAI-compatible base URL.",
   },
+  eurouter: {
+    id: "eurouter",
+    serviceKinds: ["llm"],
+    alias: "eurouter",
+    name: "EURouter",
+    icon: "router",
+    color: "#1D4ED8",
+    textIcon: "EUR",
+    passthroughModels: true,
+    website: "https://eurouter.ai",
+    // No free allowance is published, so no badge. A key was accepted but the
+    // account had no credits, so nothing about pricing tiers is claimed here.
+    hasFree: false,
+    // Deliberately says routing, not residency. EURouter is a router: its own
+    // catalog names the upstream that serves each model (claude-sonnet-5 ->
+    // AWS Bedrock, and 19 models owned by openai, 9 by anthropic, 7 by amazon).
+    // An EU-based router is a routing layer in the EU; where a model actually
+    // executes, and under whose terms, is a per-upstream property (#12985).
+    apiHint:
+      "Create an EURouter API key, then use https://api.eurouter.ai/v1 as the OpenAI-compatible base URL. Models are served by third-party upstreams listed per model in the EURouter catalog; check each upstream jurisdiction, privacy and data-transfer terms before use.",
+  },
   "mnn-ai": {
     id: "mnn-ai",
     serviceKinds: ["llm"],
@@ -1452,9 +1473,9 @@ export const APIKEY_PROVIDERS_GATEWAYS = {
     passthroughModels: true,
     website: "https://seekai.cc",
     hasFree: true,
-    freeNote: "Signup credit toward available models; amount and eligibility are set by SeekAi, not OmniRoute.",
-    authHint:
-      "Create an API key at https://seekai.cc, then paste it here as a Bearer token.",
+    freeNote:
+      "Signup credit toward available models; amount and eligibility are set by SeekAi, not OmniRoute.",
+    authHint: "Create an API key at https://seekai.cc, then paste it here as a Bearer token.",
     apiHint:
       "Create an API key at https://seekai.cc, then paste it here as a Bearer token. OpenAI-compatible base URL: https://seekai.cc/v1.",
   },
