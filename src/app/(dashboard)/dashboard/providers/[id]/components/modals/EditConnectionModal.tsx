@@ -567,6 +567,7 @@ export default function EditConnectionModal({
           validatedBaseUrl = checked.value;
         }
       }
+      let validationPsd = validatedProviderSpecificData;
       if (!isOAuth && formData.apiKey) {
         let isValid = validationResult === "success";
         if (!isValid) {
