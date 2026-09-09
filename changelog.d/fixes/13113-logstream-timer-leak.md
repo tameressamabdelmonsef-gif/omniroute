@@ -1,0 +1,1 @@
+Fix a timer leak in `createLogStream`: `stop()` aborts the in-flight fetch and returns through the `signal.aborted` branch, which skipped `clearTimeout`, leaving an armed timer per stopped stream. The stream reader is now also cancelled when the read loop exits early.
