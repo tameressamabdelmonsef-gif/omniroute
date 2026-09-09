@@ -127,6 +127,10 @@ import {
   fetchCodexDiscoveryModels,
   fetchCodexGithubCatalogModels,
 } from "./discovery/codex";
+import {
+  createCodexCatalogFetch,
+  createCodexCompatibilityWarnings,
+} from "./discovery/codexCompatibility";
 import { maybeHandleConolModelDiscovery } from "./conolDiscovery";
 import { buildNoAuthModelsResponse, filterModelsForRoute } from "./modelRouteProjection";
 
@@ -615,9 +619,7 @@ export async function GET(
       try {
         const discovery = await discoverMaxaiModels({
           providerSpecificData: connection.providerSpecificData as
-            | Record<string, unknown>
-            | null
-            | undefined,
+            Record<string, unknown> | null | undefined,
           accessToken: apiKey || accessToken,
           fetchImpl: (url, init) =>
             safeOutboundFetch(url, {
@@ -2126,32 +2128,25 @@ export async function GET(
         });
       }
 
+      const codexWarnings = createCodexCompatibilityWarnings();
       const liveModels = await fetchCodexDiscoveryModels({
         accessToken: accessToken || null,
         providerSpecificData: connection.providerSpecificData,
-        fetchImpl: (url, init) =>
-          safeOutboundFetch(url, {
-            ...SAFE_OUTBOUND_FETCH_PRESETS.modelsDiscovery,
-            guard: getProviderOutboundGuard(),
-            proxyConfig: proxy,
-            ...init,
-          }),
+        fetchImpl: createCodexCatalogFetch(proxy, getProviderOutboundGuard()),
       });
       const githubCatalogModels = await fetchCodexGithubCatalogModels({
-        fetchImpl: (url, init) =>
-          safeOutboundFetch(url, {
-            ...SAFE_OUTBOUND_FETCH_PRESETS.modelsDiscovery,
-            guard: "public-only",
-            proxyConfig: proxy,
-            ...init,
-          }),
+        onCompatibility: codexWarnings.onCompatibility,
+        fetchImpl: createCodexCatalogFetch(proxy, "public-only"),
       });
       if (liveModels && liveModels.length > 0) {
         const enrichedLiveModels =
           githubCatalogModels && githubCatalogModels.length > 0
             ? enrichCodexModelsFromGithubCatalog(liveModels, githubCatalogModels)
             : liveModels;
-        return buildApiDiscoveryResponse(finalizeCodexCatalog(enrichedLiveModels));
+        return buildApiDiscoveryResponse(
+          finalizeCodexCatalog(enrichedLiveModels),
+          codexWarnings.get() || undefined
+        );
       }
 
       if (githubCatalogModels && githubCatalogModels.length > 0) {
@@ -2160,7 +2155,9 @@ export async function GET(
           connectionId,
           models: finalizeCodexCatalog(githubCatalogModels),
           source: "github_catalog",
-          warning: "Codex live catalog unavailable — using GitHub model catalog",
+          warning: codexWarnings.append(
+            "Codex live catalog unavailable — using GitHub model catalog"
+          ),
         });
       }
 
@@ -2171,7 +2168,7 @@ export async function GET(
           connectionId,
           models: cachedCatalogModels,
           source: "cache",
-          warning: "Codex live catalog unavailable — using cached catalog",
+          warning: codexWarnings.append("Codex live catalog unavailable — using cached catalog"),
         });
       }
       return buildResponse({
@@ -2180,7 +2177,9 @@ export async function GET(
         models: finalizeCodexCatalog([]),
         source: "local_catalog",
         intentional: true,
-        warning: "Codex live and GitHub catalogs unavailable — using local catalog",
+        warning: codexWarnings.append(
+          "Codex live and GitHub catalogs unavailable — using local catalog"
+        ),
       });
     }
 
