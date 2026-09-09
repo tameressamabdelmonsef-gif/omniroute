@@ -1,0 +1,1 @@
+Bound the ACP session output buffers: `stdoutBuffer` and `stderrBuffer` now cap at 1 MiB and keep the most recent output, and `stderrBuffer` is reset per prompt instead of accumulating for the lifetime of the session.
