@@ -1,0 +1,1 @@
+Fix a process-listener leak in the node:sqlite adapter: closing an adapter left its `beforeExit`/`SIGINT`/`SIGTERM` handlers attached to `process`, pinning the adapter and its database handle for the lifetime of the run. #7494 fixed the same bug for the sql.js adapter only.
