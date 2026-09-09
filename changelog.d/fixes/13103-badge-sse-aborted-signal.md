@@ -1,0 +1,1 @@
+Fix a timer leak in the badge notification SSE stream: when the request signal was already aborted before the stream started (a client that disconnects while the route is still awaiting auth), the abort listener never fired and both intervals ran for the lifetime of the process.
