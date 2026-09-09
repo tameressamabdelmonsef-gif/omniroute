@@ -301,13 +301,19 @@ export const providerModelMutationSchema = z.object({
     .optional(),
   // #9820: optional async video-generation job preset for a custom
   // OpenAI-compatible provider whose /videos surface is a submit→poll API
-  // (agnes-video-job, muapi-video-job, sora-job). Persisted on the custom model
+  // (agnes-video-job, agnes-video-2.5-job, muapi-video-job, sora-job). Persisted on the custom model
   // row; the /v1/videos/generations handler branches on it between the
   // synchronous OpenAI-compatible path and the job/poll path. `"openai-video"`
   // is a legacy no-op value that keeps the sync handler selected.
   generationConfig: z
     .object({
-      preset: z.enum(["agnes-video-job", "muapi-video-job", "sora-job", "openai-video"]),
+      preset: z.enum([
+        "agnes-video-job",
+        "agnes-video-2.5-job",
+        "muapi-video-job",
+        "sora-job",
+        "openai-video",
+      ]),
     })
     .optional(),
 });
@@ -519,9 +525,7 @@ export const updateProviderConnectionSchema = z
     errorCode: z.union([z.string(), z.null()]).optional(),
     rateLimitedUntil: z.union([z.string(), z.null()]).optional(),
     lastTested: z.union([z.string(), z.null()]).optional(),
-    healthCheckInterval: z
-      .union([z.null(), z.coerce.number().int().min(0).max(1440)])
-      .optional(),
+    healthCheckInterval: z.union([z.null(), z.coerce.number().int().min(0).max(1440)]).optional(),
     group: z.union([z.string().max(100), z.null()]).optional(),
     maxConcurrent: z.union([z.null(), z.coerce.number().int().min(0)]).optional(),
     // Per-window quota cutoffs. Map keys are window names (e.g. "window5h",
