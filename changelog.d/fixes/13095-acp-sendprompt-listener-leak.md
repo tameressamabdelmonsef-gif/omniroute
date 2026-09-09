@@ -1,0 +1,1 @@
+Fix a listener, timer and session leak in the ACP manager: `sendPrompt` timeouts left their `stdout`/`exit` listeners attached to the `acpManager` singleton, and sessions that exited on their own were never removed from the session map.
